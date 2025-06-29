@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.repository.UserStorage;
 
@@ -19,14 +18,6 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public Item createItem(Long userId, Item item) {
-        if (userStorage.getUser(userId) == null) {
-            throw new NotFoundException("Пользователя с таким id не существует");
-        }
-        item.setOwner(userStorage.getUser(userId));
-        if ((item.getName() == null || item.getName().isBlank())
-                || (item.getDescription() == null || item.getDescription().isBlank())) {
-            throw new IllegalArgumentException("Поля name и description не могут быть пустыми");
-        }
         item.setId(id);
         items.put(item.getId(), item);
         id++;
@@ -35,23 +26,11 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public Item getItem(Long userId, Long itemId) {
-        if (!items.containsKey(itemId)) {
-            throw new NotFoundException("Предмет с таким id не найден");
-        }
-        if (!items.get(itemId).getOwner().getId().equals(userId)) {
-            throw new NotFoundException("Пользователя с таким id не существует");
-        }
         return items.get(itemId);
     }
 
     @Override
     public Item updateItem(Long userId, Long itemId, Item item) {
-        if (!items.containsKey(itemId)) {
-            throw new NotFoundException("Предмет с таким id не найден");
-        }
-        if (!items.get(itemId).getOwner().getId().equals(userId)) {
-            throw new NotFoundException("Редактировать предмет может только его владелец");
-        }
         Item updatedItem = items.get(itemId);
         if (item.getName() != null) {
             updatedItem.setName(item.getName());
@@ -68,12 +47,6 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public void deleteItem(Long userId, Long itemId) {
-        if (!items.containsKey(itemId)) {
-            throw new NotFoundException("Предмет с таким id не найден");
-        }
-        if (!items.get(itemId).getOwner().getId().equals(userId)) {
-            throw new NotFoundException("Удалить предмет может только его владелец");
-        }
         items.remove(itemId);
     }
 

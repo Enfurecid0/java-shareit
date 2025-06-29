@@ -24,14 +24,12 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    @ResponseStatus(HttpStatus.OK)
     public ItemDto getItem(@RequestHeader(HEADER_USER_ID) Long userId,
                            @PathVariable Long itemId) {
         return itemService.getItem(userId, itemId);
     }
 
     @PatchMapping("/{itemId}")
-    @ResponseStatus(HttpStatus.OK)
     public ItemDto updateItem(@RequestHeader(HEADER_USER_ID) Long userId,
                               @PathVariable Long itemId,
                               @RequestBody ItemDto itemDto) {
@@ -46,13 +44,11 @@ public class ItemController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<ItemDto> getAllItems(@RequestHeader(HEADER_USER_ID) Long userId) {
         return itemService.getAllItems(userId);
     }
 
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
     public List<ItemDto> searchItems(@RequestHeader(HEADER_USER_ID) Long userId,
                                      @RequestParam(required = false) String text) {
         return itemService.searchItems(userId, text);
