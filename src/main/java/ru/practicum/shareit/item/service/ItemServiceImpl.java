@@ -92,8 +92,11 @@ public class ItemServiceImpl implements ItemService {
         if (text == null || text.isBlank()) {
             return List.of();
         }
+        String lowerText = text.toLowerCase();
         return itemRepository.search(text).stream()
-                .filter(item -> !item.getOwner().getId().equals(userId))
+                .filter(item -> item.getAvailable())
+                .filter(item -> item.getName().toLowerCase().contains(lowerText)
+                        || item.getDescription().toLowerCase().contains(lowerText))
                 .map(ItemMapper::toItemDto)
                 .toList();
     }
