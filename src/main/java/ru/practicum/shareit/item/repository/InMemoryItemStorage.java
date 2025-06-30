@@ -42,7 +42,7 @@ public class InMemoryItemStorage implements ItemStorage {
             updatedItem.setAvailable(item.getAvailable());
         }
         items.put(itemId, updatedItem);
-        return item;
+        return updatedItem;
     }
 
     @Override
@@ -66,7 +66,6 @@ public class InMemoryItemStorage implements ItemStorage {
         return items.values().stream()
                 .filter(item -> (item.getDescription().toLowerCase().contains(textToLowerCase)
                         || item.getName().toLowerCase().contains(textToLowerCase))
-                        && item.getOwner().getId().equals(userId)
                         && item.getAvailable().booleanValue())
                 .toList();
     }
