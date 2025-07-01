@@ -1,11 +1,15 @@
 package ru.practicum.shareit.item.controller;
 
-import jakarta.validation.Valid;
+import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.maker.OnCreate;
 
 import java.util.List;
 
@@ -13,43 +17,44 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
+
     private final ItemService itemService;
-    private static final String HEADER_USER_ID = "X-Sharer-User-Id";
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemDto addItem(@RequestHeader(HEADER_USER_ID) Long userId,
-                           @Valid @RequestBody ItemDto itemDto) {
-        return itemService.createItem(userId, itemDto);
-    }
-
-    @GetMapping("/{itemId}")
-    public ItemDto getItem(@RequestHeader(HEADER_USER_ID) Long userId,
-                           @PathVariable Long itemId) {
-        return itemService.getItem(userId, itemId);
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+                              @Validated({OnCreate.class, Default.class}) @RequestBody ItemDto itemDto) {
+        try {
+            return itemService.createItem(userId, itemDto);
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader(HEADER_USER_ID) Long userId,
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                               @PathVariable Long itemId,
                               @RequestBody ItemDto itemDto) {
-        return itemService.updateItem(userId, itemId, itemDto);
+        try {
+            return itemService.updateItem(userId, itemId, itemDto);
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        }
     }
 
-    @DeleteMapping("/{itemId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteItem(@RequestHeader(HEADER_USER_ID) Long userId,
-                           @PathVariable Long itemId) {
-        itemService.deleteItem(userId, itemId);
+    @GetMapping("/{id}")
+    public ItemOwnerDto getOne(@RequestHeader(value = "X-Sharer-User-Id", required = false) Long userId,
+                               @PathVariable Long id) {
+        return itemService.getByIdAndOwnerId(id, userId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItems(@RequestHeader(HEADER_USER_ID) Long userId) {
+    public List<ItemDto> getAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.getAllItems(userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestHeader(HEADER_USER_ID) Long userId,
+    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId,
                                      @RequestParam(required = false) String text) {
         return itemService.searchItems(userId, text);
     }
