@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.controller;
 
-import exceptions.NotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,51 +19,39 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createBooking(@RequestHeader(HEADER_USER_ID) Long userId,
-                                           @Valid @RequestBody BookingRequestDto bookingRequestDto) {
-        try {
-            Object response = bookingClient.createBooking(userId, bookingRequestDto);
-            return ResponseEntity.ok(response);
-        } catch (NotFoundException e) {
-            log.error("Item not found: {}", e.getMessage());
-            return ResponseEntity.notFound().build();
-        } catch (RuntimeException e) {
-            log.error("Server error: {}", e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+    public ResponseEntity<Object> createBooking(
+            @RequestHeader(HEADER_USER_ID) Long userId,
+            @Valid @RequestBody BookingRequestDto bookingRequestDto) {
+        Object response = bookingClient.createBooking(userId, bookingRequestDto);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{bookingId}")
-    public Object approveBooking(@RequestHeader(HEADER_USER_ID) Long userId,
-                                 @PathVariable Long bookingId,
-                                 @RequestParam Boolean approved) {
+    public Object approveBooking(
+            @RequestHeader(HEADER_USER_ID) Long userId,
+            @PathVariable Long bookingId,
+            @RequestParam Boolean approved) {
         return bookingClient.approveBooking(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public Object getBooking(@RequestHeader(HEADER_USER_ID) Long userId,
-                             @PathVariable Long bookingId) {
+    public Object getBooking(
+            @RequestHeader(HEADER_USER_ID) Long userId,
+            @PathVariable Long bookingId) {
         return bookingClient.getBooking(userId, bookingId);
     }
 
     @GetMapping
-    public Object getBookingsByUser(@RequestHeader(HEADER_USER_ID) Long userId,
-                                    @RequestParam(defaultValue = "ALL") String state) {
+    public Object getBookingsByUser(
+            @RequestHeader(HEADER_USER_ID) Long userId,
+            @RequestParam(defaultValue = "ALL") String state) {
         return bookingClient.getBookingsByUser(userId, state);
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<?> getBookingsByOwner(@RequestHeader(HEADER_USER_ID) Long ownerId,
-                                                @RequestParam(defaultValue = "ALL") String state) {
-        try {
-            Object response = bookingClient.getBookingsByOwner(ownerId, state);
-            return ResponseEntity.ok(response);
-        } catch (NotFoundException e) {
-            log.error("Bookings not found: {}", e.getMessage());
-            return ResponseEntity.notFound().build();
-        } catch (RuntimeException e) {
-            log.error("Server error: {}", e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
+    public Object getBookingsByOwner(
+            @RequestHeader(HEADER_USER_ID) Long ownerId,
+            @RequestParam(defaultValue = "ALL") String state) {
+        return bookingClient.getBookingsByOwner(ownerId, state);
     }
 }

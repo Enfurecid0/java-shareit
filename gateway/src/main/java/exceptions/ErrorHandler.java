@@ -71,4 +71,12 @@ public class ErrorHandler {
         errorResponse.put("error", e.getResponseBodyAsString());
         return new ResponseEntity<>(errorResponse, e.getStatusCode());
     }
+
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<Map<String, String>> handleAllExceptions(Throwable e) {
+        log.error("Unhandled exception occurred: {}", e.getMessage(), e);
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Internal server error");
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

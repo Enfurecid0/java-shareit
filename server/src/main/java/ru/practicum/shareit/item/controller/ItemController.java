@@ -1,15 +1,12 @@
 package ru.practicum.shareit.item.controller;
 
-import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.maker.OnCreate;
 
 import java.util.List;
 
@@ -23,7 +20,7 @@ public class ItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                              @Validated({OnCreate.class, Default.class}) @RequestBody ItemDto itemDto) {
+                              @RequestBody ItemDto itemDto) {
         try {
             return itemService.createItem(userId, itemDto);
         } catch (NotFoundException e) {
